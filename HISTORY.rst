@@ -2,6 +2,28 @@
 History
 =======
 
+0.3.0 (2020-10-15)
+-------------------
+
+* Provided a way to use reproducible results
+* Added support for random state generation
+* Fixed bug in dataset options
+* Linked Igel-UI
+
+0.2.9 (2020-10-12)
+-------------------
+
+* Fixed bug in clustering
+* added a clustering example using kmeans
+* added support for clustering arguments
+
+0.2.8 (2020-10-09)
+-------------------
+
+* implemented hyperparameter search
+* added a hyperparameter example
+
+
 0.2.7 (2020-10-05)
 -------------------
 

@@ -19,7 +19,6 @@ requirements = [
 
 setup_requirements = ['pytest-runner']
 test_requirements = ['pytest>=3']
-# docs_require = ['sphinx-copybutton']
 
 setup(
     author=__author__,
@@ -46,7 +45,7 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
     ],
-    description="a machine learning tool that allows you to train, test and use models without writing code",
+    description="a delightful machine learning tool that allows you to train, test and use models without writing code",
     entry_points={
         'console_scripts': [
             'igel=igel.cli:main',

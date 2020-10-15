@@ -23,8 +23,9 @@ igel
 .. image:: https://pepy.tech/badge/igel
         :target: https://pepy.tech/project/igel
 
-.. image:: https://pepy.tech/badge/igel/month
-        :target: https://pepy.tech/project/igel/month
+.. image:: https://img.shields.io/pypi/pyversions/igel
+        :alt: PyPI - Python Version
+        :target: https://pypi.python.org/pypi/igel
 
 .. image:: https://readthedocs.org/projects/igel/badge/?version=latest
         :target: https://igel.readthedocs.io/en/latest/?badge=latest
@@ -47,6 +48,9 @@ igel
 
 A delightful machine learning tool that allows you to train/fit, test and use models **without writing code**
 
+.. note::
+    We are currently working on a GUI desktop app for igel. You can find it under
+    `Igel-UI <https://github.com/nidhaloff/igel-ui/>`_
 
 * Free software: MIT license
 * Documentation: https://igel.readthedocs.io.
@@ -76,6 +80,7 @@ Features
 - Supports different data preprocessing methods
 - Provides flexibility and data control while writing configurations
 - Supports cross validation
+- Supports both hyperparameter search (version >= 0.2.8)
 - Supports yaml and json format
 - Supports different sklearn metrics for regression, classification and clustering
 - Supports multi-output/multi-target regression and classification
@@ -90,6 +95,7 @@ a **single line of code**
 All you need is a **yaml** (or **json**) file, where you need to describe what you are trying to do. That's it!
 
 Igel supports all sklearn's machine learning functionality, whether regression, classification or clustering.
+Precisely, you can use **63** different machine learning model in igel.
 
 Installation
 -------------
@@ -101,6 +107,38 @@ Installation
     $ pip install -U igel
 
 - Check the docs for other ways to install igel from source
+
+Running with Docker
+--------------------
+
+- Use the official image (recommended):
+
+You can pull the image first from docker hub
+
+.. code-block:: console
+
+    $ docker pull nidhaloff/igel
+
+Then use it:
+
+.. code-block:: console
+
+    $ docker run -it --rm -v $(pwd):/data nidhaloff/igel fit -yml 'your_file.yaml' -dp 'your_dataset.csv'
+
+
+- Alternatively, you can create your own image locally if you want:
+
+You can run igel inside of docker by first building the image:
+
+.. code-block:: console
+
+    $ docker build -t igel .
+
+And then running it and attaching your current directory (does not need to be the igel directory) as /data (the workdir) inside of the container:
+
+.. code-block:: console
+
+    $ docker run -it --rm -v $(pwd):/data igel fit -yml 'your_file.yaml' -dp 'your_dataset.csv'
 
 Models
 -------
@@ -167,8 +205,12 @@ You can run the help command to get instructions:
 
 ---------------------------------------------------------------------------------------------------------
 
-First step is to provide a yaml file (you can also use json if you want). You can do this manually by creating a .yaml file and editing it yourself.
-However, if you are lazy (and you probably are, like me :D), you can use the igel init command to get started fast:
+First step is to provide a yaml file (you can also use json if you want)
+
+You can do this manually by creating a .yaml file (called igel.yaml by convention but you can name if whatever you want)
+and editing it yourself.
+However, if you are lazy (and you probably are, like me :D), you can use the igel init command to get started fast,
+which will create a basic config file for you on the fly.
 
 
 
@@ -185,12 +227,12 @@ However, if you are lazy (and you probably are, like me :D), you can use the ige
 
     Example:
     If I want to use neural networks to classify whether someone is sick or not using the indian-diabetes dataset,
-    then I would use this command to initliaze a yaml file:
+    then I would use this command to initialize a yaml file:
     $ igel init -type "classification" -model "NeuralNetwork" -target "sick"
     """
     $ igel init
 
-After runnig the command, an igel.yaml file will be created for you in the current working directory. You can
+After running the command, an igel.yaml file will be created for you in the current working directory. You can
 check it out and modify it if you want to, otherwise you can also create everything from scratch.
 
 - Demo:
@@ -327,7 +369,7 @@ Interactive mode is new in >= v0.2.6
 This mode basically offers you the freedom to write arguments on your way.
 You are not restricted to write the arguments directly when using the command.
 
-This means practically that you can use the commands (fit, evaluate, predict, experiment etc..)
+This means practically that you can use the commands (fit, evaluate, predict, experiment etc.)
 without specifying any additional arguments. For example:
 
 ..  code-block:: python
@@ -405,6 +447,9 @@ Here is an overview of all supported configurations (for now):
             low_memory: # [bool] -> Internally process the file in chunks, resulting in lower memory use while parsing, but possibly mixed type inference.
             memory_map: # [bool] -> If a filepath is provided for filepath_or_buffer, map the file object directly onto memory and access the data directly from there. Using this option can improve performance because there is no longer any I/O overhead.
 
+        random_numbers: # random numbers options in case you wanted to generate the same random numbers on each run
+            generate_reproducible:  # [bool] -> set this to true to generate reproducible results
+            seed:   # [int] -> the seed number is optional. A seed will be set up for you if you didn't provide any
 
         split:  # split options
             test_size: 0.2  #[float] -> 0.2 means 20% for the test data, so 80% are automatically for training
@@ -430,6 +475,16 @@ Here is an overview of all supported configurations (for now):
             cv: # [int] -> number of kfold (default 5)
             n_jobs:   # [signed int] -> The number of CPUs to use to do the computation (default None)
             verbose: # [int] -> The verbosity level. (default 0)
+        hyperparameter_search:
+            method: grid_search   # method you want to use: grid_search and random_search are supported
+            parameter_grid:     # put your parameters grid here that you want to use, an example is provided below
+                param1: [val1, val2]
+                param2: [val1, val2]
+            arguments:  # additional arguments you want to provide for the hyperparameter search
+                cv: 5   # number of folds
+                refit: true   # whether to refit the model after the search
+                return_train_score: false   # whether to return the train score
+                verbose: 0      # verbosity level
 
     # target you want to predict
     target:  # list of strings: basically put here the column(s), you want to predict that exist in your csv dataset
@@ -704,6 +759,8 @@ is conducted on the target column to show you more the capabilities of igel.
 
 Furthermore, the multioutput-example contains a **multioutput regression** example.
 Finally, the cv-example contains an example using the Ridge classifier using cross validation.
+
+You can also find a cross validation and a hyperparameter search examples in the folder.
 
 I suggest you play around with the examples and igel cli. However,
 you can also directly execute the fit.py, evaluate.py and predict.py if you want to.
